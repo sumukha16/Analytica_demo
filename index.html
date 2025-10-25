@@ -676,520 +676,567 @@
     </footer>
 
     <script>
-        // ========== CONFIGURATION ==========
-        // REPLACE THIS WITH YOUR GOOGLE APPS SCRIPT URL
-        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwH6UNsDOi8KgsBpz6aAnQm62cvIdKduUtWcCoGFs4YReWWZZ60kr6pmemwQkltG5s/exec';
-        
-        // Sample events data
-        const events = [
-            {
-                id: 1,
-                title: "Tech Talk",
-                date: "October 31, 2025",
-                location: "Main Auditorium",
-                image: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
-            },
-            {
-                id: 2,
-                title: "Vibe Coding",
-                date: "October 31, 2025",
-                location: "Computer Lab 101",
-                image: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
-            },
-            {
-                id: 3,
-                title: "Tech Debate",
-                date: "October 31, 2025",
-                location: "Seminar Hall",
-                image: "https://images.unsplash.com/photo-1581094794329-c8112a89af12?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
-            },
-            {
-                id: 4,
-                title: "Tech Memes",
-                date: "October 31, 2025",
-                location: "Student Lounge",
-                image: "https://images.unsplash.com/photo-1611224923853-80b023f02d71?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
-            },
-            {
-                id: 5,
-                title: "Quiz Competition",
-                date: "October 31, 2025",
-                location: "Conference Room",
-                image: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
-            },
-            {
-                id: 6,
-                title: "Mystery Solving",
-                date: "October 31, 2025",
-                location: "Activity Room",
-                image: "https://images.unsplash.com/photo-1553877522-43269d4ea984?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
-            },
-            {
-                id: 7,
-                title: "Surprise Events",
-                date: "October 31, 2025",
-                location: "To be announced",
-                image: "https://images.unsplash.com/photo-1535016120720-40c646be5580?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
-            }
-        ];
-
-        // SECURE ADMIN CREDENTIALS
-        const adminCredentials = (function() {
-            const user1Codes = [112, 114, 97, 106, 119, 97, 108]; // prajwal
-            const user2Codes = [115, 117, 109, 117, 107, 104, 97]; // sumukha
-            const passCodes = [98, 118, 99, 46, 46, 46, 46, 46, 64, 49, 54, 50, 48, 50, 53]; // bvc.....@162025
-            
-            function codesToString(codes) {
-                return String.fromCharCode(...codes);
-            }
-            
-            const username1 = codesToString(user1Codes);
-            const username2 = codesToString(user2Codes);
-            const password = codesToString(passCodes);
-            
-            return {
-                [username1]: password,
-                [username2]: password
-            };
-        })();
-
-        // DOM Elements
-        const eventsContainer = document.getElementById('events-container');
-        const registrationForm = document.getElementById('registration-form');
-        const successMessage = document.getElementById('success-message');
-        const formEventTitle = document.getElementById('form-event-title');
-        const backToEventsBtn = document.getElementById('back-to-events');
-        const backToHomeBtn = document.getElementById('back-to-home');
-        const studentRegistrationForm = document.getElementById('student-registration');
-        const adminLogin = document.getElementById('admin-login');
-        const adminPanel = document.getElementById('admin-panel');
-        const loginForm = document.getElementById('login-form');
-        const loginError = document.getElementById('login-error');
-        const adminName = document.getElementById('admin-name');
-        const logoutLink = document.getElementById('logout-link');
-        const viewRegistrationsBtn = document.getElementById('view-registrations');
-        const refreshDataBtn = document.getElementById('refresh-data');
-        const exportAllCsvBtn = document.getElementById('export-all-csv');
-        const syncToSheetsBtn = document.getElementById('sync-to-sheets');
-        const eventCsvButtons = document.getElementById('event-csv-buttons');
-        const registrationsContainer = document.getElementById('registrations-container');
-        const syncStatusContainer = document.getElementById('sync-status-container');
-        const tabs = document.querySelectorAll('.tab');
-        const tabContents = document.querySelectorAll('.tab-content');
-
-        // Global variables
-        let registrations = JSON.parse(localStorage.getItem('eventRegistrations')) || [];
-        let currentEvent = null;
-        let currentAdmin = null;
-
-        // ========== GOOGLE SHEETS FUNCTIONS ==========
-        
-        // Save registration to Google Sheets
-        async function saveRegistrationToSheets(registration) {
-            try {
-                // Add timestamp for registration
-                const registrationWithTimestamp = {
-                    ...registration,
-                    registrationDate: new Date().toLocaleString()
-                };
-
-                const response = await fetch(GOOGLE_SCRIPT_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(registrationWithTimestamp)
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    showSyncStatus('Registration saved to Google Sheets successfully!', 'success');
-                    return true;
-                } else {
-                    throw new Error(result.error || 'Failed to save registration');
-                }
-            } catch (error) {
-                console.error('Error saving to Google Sheets:', error);
-                showSyncStatus('Failed to save to Google Sheets. Using local storage.', 'error');
-                // Fallback to localStorage
-                return saveToLocalStorage(registration);
-            }
+    // ========== CONFIGURATION ==========
+    // REPLACE THIS WITH YOUR ACTUAL GOOGLE APPS SCRIPT URL
+    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwH6UNsDOi8KgsBpz6aAnQm62cvIdKduUtWcCoGFs4YReWWZZ60kr6pmemwQkltG5s/exec';
+    
+    // Sample events data
+    const events = [
+        {
+            id: 1,
+            title: "Tech Talk",
+            date: "October 31, 2025",
+            location: "Main Auditorium",
+            image: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
+        },
+        {
+            id: 2,
+            title: "Vibe Coding",
+            date: "October 31, 2025",
+            location: "Computer Lab 101",
+            image: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
+        },
+        {
+            id: 3,
+            title: "Tech Debate",
+            date: "October 31, 2025",
+            location: "Seminar Hall",
+            image: "https://images.unsplash.com/photo-1581094794329-c8112a89af12?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
+        },
+        {
+            id: 4,
+            title: "Tech Memes",
+            date: "October 31, 2025",
+            location: "Student Lounge",
+            image: "https://images.unsplash.com/photo-1611224923853-80b023f02d71?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
+        },
+        {
+            id: 5,
+            title: "Quiz Competition",
+            date: "October 31, 2025",
+            location: "Conference Room",
+            image: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
+        },
+        {
+            id: 6,
+            title: "Mystery Solving",
+            date: "October 31, 2025",
+            location: "Activity Room",
+            image: "https://images.unsplash.com/photo-1553877522-43269d4ea984?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
+        },
+        {
+            id: 7,
+            title: "Surprise Events",
+            date: "October 31, 2025",
+            location: "To be announced",
+            image: "https://images.unsplash.com/photo-1535016120720-40c646be5580?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
         }
+    ];
 
-        // Load registrations from Google Sheets
-        async function loadRegistrationsFromSheets() {
-            try {
-                showSyncStatus('Loading registrations from Google Sheets...', 'loading');
-                
-                const response = await fetch(GOOGLE_SCRIPT_URL);
-                if (!response.ok) {
-                    throw new Error('Failed to fetch registrations from Google Sheets');
-                }
-                
-                const sheetsData = await response.json();
-                registrations = sheetsData;
-                localStorage.setItem('eventRegistrations', JSON.stringify(registrations));
-                
-                showSyncStatus('Data loaded from Google Sheets successfully!', 'success');
-                return registrations;
-            } catch (error) {
-                console.error('Error loading from Google Sheets:', error);
-                showSyncStatus('Using local storage data. Google Sheets unavailable.', 'error');
-                // Fallback to localStorage
-                registrations = JSON.parse(localStorage.getItem('eventRegistrations')) || [];
-                return registrations;
-            }
-        }
-
-        // Sync all local registrations to Google Sheets
-        async function syncAllToSheets() {
-            try {
-                showSyncStatus('Syncing all registrations to Google Sheets...', 'loading');
-                let successCount = 0;
-                let errorCount = 0;
-
-                for (const registration of registrations) {
-                    try {
-                        const response = await fetch(GOOGLE_SCRIPT_URL, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify(registration)
-                        });
-                        
-                        const result = await response.json();
-                        if (result.success) {
-                            successCount++;
-                        } else {
-                            errorCount++;
-                        }
-                    } catch (error) {
-                        errorCount++;
-                    }
-                }
-
-                if (errorCount === 0) {
-                    showSyncStatus(`All ${successCount} registrations synced to Google Sheets successfully!`, 'success');
-                } else {
-                    showSyncStatus(`Synced ${successCount} registrations. ${errorCount} failed.`, 'error');
-                }
-            } catch (error) {
-                console.error('Error syncing to Google Sheets:', error);
-                showSyncStatus('Failed to sync with Google Sheets.', 'error');
-            }
-        }
-
-        // ========== LOCAL STORAGE FUNCTIONS ==========
+    // SECURE ADMIN CREDENTIALS
+    const adminCredentials = (function() {
+        const user1Codes = [112, 114, 97, 106, 119, 97, 108]; // prajwal
+        const user2Codes = [115, 117, 109, 117, 107, 104, 97]; // sumukha
+        const passCodes = [98, 118, 99, 46, 46, 46, 46, 46, 64, 49, 54, 50, 48, 50, 53]; // bvc.....@162025
         
-        function saveToLocalStorage(registration) {
-            const registrationWithId = {
+        function codesToString(codes) {
+            return String.fromCharCode(...codes);
+        }
+        
+        const username1 = codesToString(user1Codes);
+        const username2 = codesToString(user2Codes);
+        const password = codesToString(passCodes);
+        
+        return {
+            [username1]: password,
+            [username2]: password
+        };
+    })();
+
+    // DOM Elements
+    const eventsContainer = document.getElementById('events-container');
+    const registrationForm = document.getElementById('registration-form');
+    const successMessage = document.getElementById('success-message');
+    const formEventTitle = document.getElementById('form-event-title');
+    const backToEventsBtn = document.getElementById('back-to-events');
+    const backToHomeBtn = document.getElementById('back-to-home');
+    const studentRegistrationForm = document.getElementById('student-registration');
+    const adminLogin = document.getElementById('admin-login');
+    const adminPanel = document.getElementById('admin-panel');
+    const loginForm = document.getElementById('login-form');
+    const loginError = document.getElementById('login-error');
+    const adminName = document.getElementById('admin-name');
+    const logoutLink = document.getElementById('logout-link');
+    const viewRegistrationsBtn = document.getElementById('view-registrations');
+    const refreshDataBtn = document.getElementById('refresh-data');
+    const exportAllCsvBtn = document.getElementById('export-all-csv');
+    const syncToSheetsBtn = document.getElementById('sync-to-sheets');
+    const eventCsvButtons = document.getElementById('event-csv-buttons');
+    const registrationsContainer = document.getElementById('registrations-container');
+    const syncStatusContainer = document.getElementById('sync-status-container');
+    const tabs = document.querySelectorAll('.tab');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    // Global variables
+    let registrations = [];
+    let currentEvent = null;
+    let currentAdmin = null;
+
+    // ========== GOOGLE SHEETS FUNCTIONS ==========
+    
+    // Save registration to Google Sheets
+    async function saveRegistrationToSheets(registration) {
+        try {
+            // Add timestamp for registration
+            const registrationWithTimestamp = {
                 ...registration,
-                id: Date.now(),
                 registrationDate: new Date().toLocaleString()
             };
+
+            console.log('📤 Saving to Google Sheets:', registrationWithTimestamp);
             
-            registrations.push(registrationWithId);
-            localStorage.setItem('eventRegistrations', JSON.stringify(registrations));
-            return true;
-        }
-
-        // ========== APPLICATION FUNCTIONS ==========
-
-        // Initialize the application
-        async function init() {
-            displayEvents();
-            setupEventListeners();
-        }
-
-        // Display events
-        function displayEvents() {
-            eventsContainer.innerHTML = '';
+            const response = await fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(registrationWithTimestamp)
+            });
             
-            events.forEach(event => {
-                const eventCard = document.createElement('div');
-                eventCard.className = 'event-card';
-                eventCard.innerHTML = `
-                    <div class="event-image" style="background-image: url('${event.image}')"></div>
-                    <div class="event-details">
-                        <h3 class="event-title">${event.title}</h3>
-                        <div class="event-date">
-                            <span class="event-icon">📅</span>
-                            <span>${event.date}</span>
-                        </div>
-                        <div class="event-location">
-                            <span class="event-icon">📍</span>
-                            <span>${event.location}</span>
-                        </div>
-                    </div>
-                `;
-                
-                eventCard.addEventListener('click', () => openRegistrationForm(event));
-                eventsContainer.appendChild(eventCard);
-            });
+            const result = await response.json();
+            console.log('📥 Google Sheets response:', result);
+            
+            if (result.success) {
+                showSyncStatus('✅ Registration saved to Google Sheets!', 'success');
+                return true;
+            } else {
+                throw new Error(result.error || 'Failed to save registration');
+            }
+        } catch (error) {
+            console.error('❌ Error saving to Google Sheets:', error);
+            showSyncStatus('❌ Failed to save to Google Sheets', 'error');
+            // Don't fallback to localStorage - let the user know it failed
+            return false;
         }
+    }
 
-        // Setup event listeners
-        function setupEventListeners() {
-            // Tab switching
-            tabs.forEach(tab => {
-                tab.addEventListener('click', () => {
-                    const tabId = tab.getAttribute('data-tab');
-                    
-                    tabs.forEach(t => t.classList.remove('active'));
-                    tab.classList.add('active');
-                    
-                    tabContents.forEach(content => {
-                        content.classList.remove('active');
-                        if (content.id === tabId) {
-                            content.classList.add('active');
-                        }
-                    });
+    // Load registrations from Google Sheets
+    async function loadRegistrationsFromSheets() {
+        try {
+            showSyncStatus('🔄 Loading registrations from Google Sheets...', 'loading');
+            console.log('📥 Fetching data from Google Sheets...');
+            
+            const response = await fetch(GOOGLE_SCRIPT_URL);
+            console.log('📊 Response status:', response.status);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const sheetsData = await response.json();
+            console.log('✅ Data received from Google Sheets:', sheetsData);
+            
+            // Replace local registrations with data from Google Sheets
+            registrations = sheetsData;
+            
+            showSyncStatus(`✅ Loaded ${registrations.length} registrations from Google Sheets!`, 'success');
+            return registrations;
+        } catch (error) {
+            console.error('❌ Error loading from Google Sheets:', error);
+            showSyncStatus('❌ Failed to load from Google Sheets', 'error');
+            // Keep existing registrations (don't reset to empty array)
+            return registrations;
+        }
+    }
 
-                    // Load Google Sheets data when admin panel is opened
-                    if (tabId === 'admin' && currentAdmin) {
-                        loadRegistrationsFromSheets().then(() => {
-                            updateEventCsvButtons();
-                        });
-                    }
-                });
-            });
+    // Sync all local registrations to Google Sheets
+    async function syncAllToSheets() {
+        try {
+            showSyncStatus('🔄 Syncing all registrations to Google Sheets...', 'loading');
+            let successCount = 0;
+            let errorCount = 0;
 
-            // Form submission - UPDATED FOR GOOGLE SHEETS
-            studentRegistrationForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                
-                const formData = new FormData(studentRegistrationForm);
-                const registration = {
-                    name: formData.get('student-name'),
-                    usn: formData.get('student-usn'),
-                    year: formData.get('student-year'),
-                    phone: formData.get('student-phone'),
-                    eventName: currentEvent.title
-                };
-                
+            // Get current local registrations
+            const localRegistrations = JSON.parse(localStorage.getItem('eventRegistrations')) || [];
+            
+            console.log(`📤 Syncing ${localRegistrations.length} local registrations to Google Sheets`);
+
+            for (const registration of localRegistrations) {
                 try {
-                    // Show loading state
-                    const submitBtn = studentRegistrationForm.querySelector('.submit-btn');
-                    submitBtn.textContent = 'Registering...';
-                    submitBtn.disabled = true;
+                    const response = await fetch(GOOGLE_SCRIPT_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(registration)
+                    });
                     
-                    // Try to save to Google Sheets first, fallback to localStorage
-                    await saveRegistrationToSheets(registration);
-                    
-                    // Show success message
-                    registrationForm.classList.remove('active');
-                    successMessage.classList.add('active');
-                    
+                    const result = await response.json();
+                    if (result.success) {
+                        successCount++;
+                    } else {
+                        errorCount++;
+                    }
                 } catch (error) {
-                    alert('Registration failed. Please try again.\nError: ' + error.message);
-                } finally {
-                    // Reset button state
-                    const submitBtn = studentRegistrationForm.querySelector('.submit-btn');
-                    submitBtn.textContent = 'Register for Event';
-                    submitBtn.disabled = false;
+                    errorCount++;
                 }
-            });
+            }
 
-            // Navigation buttons
-            backToEventsBtn.addEventListener('click', () => {
-                registrationForm.classList.remove('active');
-                document.getElementById('events').classList.add('active');
-            });
-
-            backToHomeBtn.addEventListener('click', () => {
-                successMessage.classList.remove('active');
-                document.getElementById('events').classList.add('active');
-                studentRegistrationForm.reset();
-            });
-
-            // Admin login
-            loginForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const username = document.getElementById('admin-username').value;
-                const password = document.getElementById('admin-password').value;
-                
-                if (adminCredentials[username] && adminCredentials[username] === password) {
-                    currentAdmin = username;
-                    localStorage.setItem('adminSession', username);
-                    adminLogin.style.display = 'none';
-                    adminPanel.style.display = 'block';
-                    adminName.textContent = username;
-                    loginError.textContent = '';
-                    
-                    // Load registrations when admin logs in
-                    await loadRegistrationsFromSheets();
-                    updateEventCsvButtons();
-                } else {
-                    loginError.textContent = 'Invalid username or password';
-                }
-            });
-
-            logoutLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                currentAdmin = null;
-                localStorage.removeItem('adminSession');
-                adminLogin.style.display = 'block';
-                adminPanel.style.display = 'none';
-                document.getElementById('admin-username').value = '';
-                document.getElementById('admin-password').value = '';
-            });
-
-            // Admin panel functionality
-            viewRegistrationsBtn.addEventListener('click', displayRegistrationsTable);
-            refreshDataBtn.addEventListener('click', async () => {
-                await loadRegistrationsFromSheets();
-                updateEventCsvButtons();
-                displayRegistrationsTable();
-            });
-            exportAllCsvBtn.addEventListener('click', exportAllToCSV);
-            syncToSheetsBtn.addEventListener('click', syncAllToSheets);
-        }
-
-        function openRegistrationForm(event) {
-            currentEvent = event;
-            formEventTitle.textContent = `Register for ${event.title}`;
-            document.getElementById('events').classList.remove('active');
-            registrationForm.classList.add('active');
-        }
-
-        function updateEventCsvButtons() {
-            eventCsvButtons.innerHTML = '';
-            events.forEach(event => {
-                const eventRegistrations = registrations.filter(reg => reg.eventName === event.title);
-                const button = document.createElement('button');
-                button.className = 'event-csv-btn';
-                button.innerHTML = `Export ${event.title} (${eventRegistrations.length})`;
-                button.addEventListener('click', () => exportEventToCSV(event.title));
-                eventCsvButtons.appendChild(button);
-            });
-        }
-
-        function displayRegistrationsTable() {
-            if (registrations.length === 0) {
-                registrationsContainer.innerHTML = '<p style="text-align: center; color: #7f8c8d; padding: 40px;">No registrations found.</p>';
-                return;
+            if (errorCount === 0) {
+                showSyncStatus(`✅ All ${successCount} registrations synced to Google Sheets!`, 'success');
+            } else {
+                showSyncStatus(`⚠️ Synced ${successCount} registrations. ${errorCount} failed.`, 'error');
             }
             
-            let tableHTML = `
-                <table class="registrations-table">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>USN</th>
-                            <th>Year</th>
-                            <th>Phone</th>
-                            <th>Event</th>
-                            <th>Registration Date</th>
-                            <th>Source</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-            `;
-            
-            registrations.forEach(reg => {
-                const source = reg.id ? 'Local' : 'Google Sheets';
-                tableHTML += `
-                    <tr>
-                        <td>${reg.name}</td>
-                        <td>${reg.usn}</td>
-                        <td>${reg.year}</td>
-                        <td>${reg.phone}</td>
-                        <td>${reg.eventName}</td>
-                        <td>${reg.registrationDate}</td>
-                        <td>${source}</td>
-                    </tr>
-                `;
-            });
-            
-            tableHTML += `
-                    </tbody>
-                </table>
-                <p style="margin-top: 20px; color: #7f8c8d; text-align: center;">Total Registrations: ${registrations.length}</p>
-            `;
-            
-            registrationsContainer.innerHTML = tableHTML;
+            // Reload data from Google Sheets after sync
+            await loadRegistrationsFromSheets();
+        } catch (error) {
+            console.error('❌ Error syncing to Google Sheets:', error);
+            showSyncStatus('❌ Failed to sync with Google Sheets', 'error');
         }
+    }
 
-        function exportAllToCSV() {
-            if (registrations.length === 0) {
-                alert('No registrations to export.');
-                return;
-            }
-            
-            let csvContent = "Name,USN,Year,Phone,Event,Registration Date\n";
-            registrations.forEach(reg => {
-                csvContent += `"${reg.name}","${reg.usn}","${reg.year}","${reg.phone}","${reg.eventName}","${reg.registrationDate}"\n`;
-            });
-            
-            downloadCSV(csvContent, 'all_event_registrations.csv');
-        }
+    // ========== APPLICATION FUNCTIONS ==========
 
-        function exportEventToCSV(eventName) {
-            const eventRegistrations = registrations.filter(reg => reg.eventName === eventName);
-            
-            if (eventRegistrations.length === 0) {
-                alert(`No registrations found for ${eventName}.`);
-                return;
-            }
-            
-            let csvContent = "Name,USN,Year,Phone,Event,Registration Date\n";
-            eventRegistrations.forEach(reg => {
-                csvContent += `"${reg.name}","${reg.usn}","${reg.year}","${reg.phone}","${reg.eventName}","${reg.registrationDate}"\n`;
-            });
-            
-            const filename = `${eventName.toLowerCase().replace(/\s+/g, '_')}_registrations.csv`;
-            downloadCSV(csvContent, filename);
-        }
+    // Initialize the application
+    async function init() {
+        displayEvents();
+        setupEventListeners();
+        
+        // Test Google Sheets connection on startup
+        await testGoogleSheetsConnection();
+    }
 
-        function downloadCSV(csvContent, filename) {
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.setAttribute('href', url);
-            link.setAttribute('download', filename);
-            link.style.visibility = 'hidden';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-
-        function showSyncStatus(message, type) {
-            syncStatusContainer.innerHTML = `
-                <div class="sync-status sync-${type}">
-                    ${message}
+    // Display events
+    function displayEvents() {
+        eventsContainer.innerHTML = '';
+        
+        events.forEach(event => {
+            const eventCard = document.createElement('div');
+            eventCard.className = 'event-card';
+            eventCard.innerHTML = `
+                <div class="event-image" style="background-image: url('${event.image}')"></div>
+                <div class="event-details">
+                    <h3 class="event-title">${event.title}</h3>
+                    <div class="event-date">
+                        <span class="event-icon">📅</span>
+                        <span>${event.date}</span>
+                    </div>
+                    <div class="event-location">
+                        <span class="event-icon">📍</span>
+                        <span>${event.location}</span>
+                    </div>
                 </div>
             `;
             
-            // Auto-hide success messages after 5 seconds
-            if (type === 'success') {
-                setTimeout(() => {
-                    syncStatusContainer.innerHTML = '';
-                }, 5000);
-            }
-        }
+            eventCard.addEventListener('click', () => openRegistrationForm(event));
+            eventsContainer.appendChild(eventCard);
+        });
+    }
 
-        // Check if admin is already logged in
-        function checkAdminSession() {
-            const savedAdmin = localStorage.getItem('adminSession');
-            if (savedAdmin && adminCredentials[savedAdmin]) {
-                currentAdmin = savedAdmin;
+    // Setup event listeners
+    function setupEventListeners() {
+        // Tab switching
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabId = tab.getAttribute('data-tab');
+                
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                tabContents.forEach(content => {
+                    content.classList.remove('active');
+                    if (content.id === tabId) {
+                        content.classList.add('active');
+                    }
+                });
+
+                // Load Google Sheets data when admin panel is opened
+                if (tabId === 'admin' && currentAdmin) {
+                    loadRegistrationsFromSheets().then(() => {
+                        updateEventCsvButtons();
+                    });
+                }
+            });
+        });
+
+        // Form submission - ONLY Google Sheets
+        studentRegistrationForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(studentRegistrationForm);
+            const registration = {
+                name: formData.get('student-name'),
+                usn: formData.get('student-usn'),
+                year: formData.get('student-year'),
+                phone: formData.get('student-phone'),
+                eventName: currentEvent.title
+            };
+            
+            try {
+                // Show loading state
+                const submitBtn = studentRegistrationForm.querySelector('.submit-btn');
+                submitBtn.textContent = 'Registering...';
+                submitBtn.disabled = true;
+                
+                // Save to Google Sheets
+                const success = await saveRegistrationToSheets(registration);
+                
+                if (success) {
+                    // Show success message
+                    registrationForm.classList.remove('active');
+                    successMessage.classList.add('active');
+                } else {
+                    alert('Registration failed. Please try again later.');
+                }
+                
+            } catch (error) {
+                alert('Registration failed. Please try again.\nError: ' + error.message);
+            } finally {
+                // Reset button state
+                const submitBtn = studentRegistrationForm.querySelector('.submit-btn');
+                submitBtn.textContent = 'Register for Event';
+                submitBtn.disabled = false;
+            }
+        });
+
+        // Navigation buttons
+        backToEventsBtn.addEventListener('click', () => {
+            registrationForm.classList.remove('active');
+            document.getElementById('events').classList.add('active');
+        });
+
+        backToHomeBtn.addEventListener('click', () => {
+            successMessage.classList.remove('active');
+            document.getElementById('events').classList.add('active');
+            studentRegistrationForm.reset();
+        });
+
+        // Admin login
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('admin-username').value;
+            const password = document.getElementById('admin-password').value;
+            
+            if (adminCredentials[username] && adminCredentials[username] === password) {
+                currentAdmin = username;
+                localStorage.setItem('adminSession', username);
                 adminLogin.style.display = 'none';
                 adminPanel.style.display = 'block';
-                adminName.textContent = savedAdmin;
-                loadRegistrationsFromSheets().then(() => {
-                    updateEventCsvButtons();
-                });
+                adminName.textContent = username;
+                loginError.textContent = '';
+                
+                // Load registrations from Google Sheets when admin logs in
+                await loadRegistrationsFromSheets();
+                updateEventCsvButtons();
+                
+            } else {
+                loginError.textContent = 'Invalid username or password';
             }
-        }
-
-        // Initialize when page loads
-        document.addEventListener('DOMContentLoaded', () => {
-            init();
-            checkAdminSession();
         });
-    </script>
+
+        logoutLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            currentAdmin = null;
+            localStorage.removeItem('adminSession');
+            adminLogin.style.display = 'block';
+            adminPanel.style.display = 'none';
+            document.getElementById('admin-username').value = '';
+            document.getElementById('admin-password').value = '';
+        });
+
+        // Admin panel functionality
+        viewRegistrationsBtn.addEventListener('click', () => displayRegistrationsTable());
+        refreshDataBtn.addEventListener('click', async () => {
+            await loadRegistrationsFromSheets();
+            updateEventCsvButtons();
+            displayRegistrationsTable();
+        });
+        exportAllCsvBtn.addEventListener('click', exportAllToCSV);
+        syncToSheetsBtn.addEventListener('click', syncAllToSheets);
+    }
+
+    function openRegistrationForm(event) {
+        currentEvent = event;
+        formEventTitle.textContent = `Register for ${event.title}`;
+        document.getElementById('events').classList.remove('active');
+        registrationForm.classList.add('active');
+    }
+
+    function updateEventCsvButtons() {
+        eventCsvButtons.innerHTML = '';
+        events.forEach(event => {
+            const eventRegistrations = registrations.filter(reg => reg.eventName === event.title);
+            const button = document.createElement('button');
+            button.className = 'event-csv-btn';
+            button.innerHTML = `Export ${event.title} (${eventRegistrations.length})`;
+            button.addEventListener('click', () => exportEventToCSV(event.title));
+            eventCsvButtons.appendChild(button);
+        });
+    }
+
+    function displayRegistrationsTable() {
+        console.log('📊 Displaying registrations table. Total:', registrations.length);
+        
+        if (registrations.length === 0) {
+            registrationsContainer.innerHTML = `
+                <div style="text-align: center; padding: 40px; color: #7f8c8d;">
+                    <h3>No registrations found</h3>
+                    <p>Try refreshing the data or check Google Sheets connection.</p>
+                    <button class="admin-btn" onclick="loadRegistrationsFromSheets().then(() => displayRegistrationsTable())" style="margin-top: 15px;">
+                        Refresh Data
+                    </button>
+                </div>
+            `;
+            return;
+        }
+        
+        let tableHTML = `
+            <table class="registrations-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>USN</th>
+                        <th>Year</th>
+                        <th>Phone</th>
+                        <th>Event</th>
+                        <th>Registration Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+        
+        registrations.forEach(reg => {
+            tableHTML += `
+                <tr>
+                    <td>${reg.name}</td>
+                    <td>${reg.usn}</td>
+                    <td>${reg.year}</td>
+                    <td>${reg.phone}</td>
+                    <td>${reg.eventName}</td>
+                    <td>${reg.registrationDate}</td>
+                </tr>
+            `;
+        });
+        
+        tableHTML += `
+                </tbody>
+            </table>
+            <p style="margin-top: 20px; color: #7f8c8d; text-align: center;">
+                Total Registrations: ${registrations.length} | 
+                Source: Google Sheets | 
+                Last Updated: ${new Date().toLocaleString()}
+            </p>
+        `;
+        
+        registrationsContainer.innerHTML = tableHTML;
+    }
+
+    function exportAllToCSV() {
+        if (registrations.length === 0) {
+            alert('No registrations to export.');
+            return;
+        }
+        
+        let csvContent = "Name,USN,Year,Phone,Event,Registration Date\n";
+        registrations.forEach(reg => {
+            csvContent += `"${reg.name}","${reg.usn}","${reg.year}","${reg.phone}","${reg.eventName}","${reg.registrationDate}"\n`;
+        });
+        
+        downloadCSV(csvContent, 'all_event_registrations.csv');
+    }
+
+    function exportEventToCSV(eventName) {
+        const eventRegistrations = registrations.filter(reg => reg.eventName === eventName);
+        
+        if (eventRegistrations.length === 0) {
+            alert(`No registrations found for ${eventName}.`);
+            return;
+        }
+        
+        let csvContent = "Name,USN,Year,Phone,Event,Registration Date\n";
+        eventRegistrations.forEach(reg => {
+            csvContent += `"${reg.name}","${reg.usn}","${reg.year}","${reg.phone}","${reg.eventName}","${reg.registrationDate}"\n`;
+        });
+        
+        const filename = `${eventName.toLowerCase().replace(/\s+/g, '_')}_registrations.csv`;
+        downloadCSV(csvContent, filename);
+    }
+
+    function downloadCSV(csvContent, filename) {
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.setAttribute('href', url);
+        link.setAttribute('download', filename);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    function showSyncStatus(message, type) {
+        syncStatusContainer.innerHTML = `
+            <div class="sync-status sync-${type}">
+                ${message}
+            </div>
+        `;
+        
+        // Auto-hide success messages after 5 seconds
+        if (type === 'success') {
+            setTimeout(() => {
+                syncStatusContainer.innerHTML = '';
+            }, 5000);
+        }
+    }
+
+    // Test Google Sheets connection
+    async function testGoogleSheetsConnection() {
+        try {
+            console.log('🔗 Testing Google Sheets connection...');
+            console.log('URL:', GOOGLE_SCRIPT_URL);
+            
+            const response = await fetch(GOOGLE_SCRIPT_URL);
+            console.log('📊 Response status:', response.status);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            console.log('✅ Connection successful! Data sample:', data.slice(0, 2));
+            
+            showSyncStatus('✅ Google Sheets connection successful!', 'success');
+            return true;
+        } catch (error) {
+            console.error('❌ Connection failed:', error);
+            showSyncStatus('❌ Google Sheets connection failed', 'error');
+            return false;
+        }
+    }
+
+    // Check if admin is already logged in
+    function checkAdminSession() {
+        const savedAdmin = localStorage.getItem('adminSession');
+        if (savedAdmin && adminCredentials[savedAdmin]) {
+            currentAdmin = savedAdmin;
+            adminLogin.style.display = 'none';
+            adminPanel.style.display = 'block';
+            adminName.textContent = savedAdmin;
+            // Load data from Google Sheets when admin is already logged in
+            loadRegistrationsFromSheets().then(() => {
+                updateEventCsvButtons();
+            });
+        }
+    }
+
+    // Initialize when page loads
+    document.addEventListener('DOMContentLoaded', () => {
+        init();
+        checkAdminSession();
+    });
+</script>
 </body>
 </html>
+
 
