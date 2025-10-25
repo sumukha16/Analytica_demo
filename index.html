@@ -4,435 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Department of CSE(Data Science) - Event Registration</title>
+    <!-- Your existing CSS remains the same -->
     <style>
+        /* Your existing CSS styles here */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-
-        body {
-            background-color: #f5f7fa;
-            color: #333;
-            line-height: 1.6;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        header {
-            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-            color: white;
-            padding: 20px 0;
-            text-align: center;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-            margin-bottom: 10px;
-        }
-
-        .logo-icon {
-            font-size: 2.5rem;
-        }
-
-        h1 {
-            font-size: 2.2rem;
-            margin-bottom: 5px;
-        }
-
-        .subtitle {
-            font-size: 1.1rem;
-            opacity: 0.9;
-        }
-
-        .tabs {
-            display: flex;
-            justify-content: center;
-            margin: 30px 0;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .tab {
-            padding: 12px 30px;
-            cursor: pointer;
-            font-size: 1.1rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            border-bottom: 3px solid transparent;
-        }
-
-        .tab.active {
-            color: #2575fc;
-            border-bottom: 3px solid #2575fc;
-        }
-
-        .tab-content {
-            display: none;
-            animation: fadeIn 0.5s;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        /* Events Section */
-        .events-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 25px;
-            margin-top: 20px;
-        }
-
-        .event-card {
-            background: white;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s, box-shadow 0.3s;
-            cursor: pointer;
-        }
-
-        .event-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
-        }
-
-        .event-image {
-            height: 180px;
-            background-size: cover;
-            background-position: center;
-        }
-
-        .event-details {
-            padding: 20px;
-        }
-
-        .event-title {
-            font-size: 1.3rem;
-            margin-bottom: 10px;
-            color: #2c3e50;
-        }
-
-        .event-date, .event-location {
-            display: flex;
-            align-items: center;
-            margin-bottom: 8px;
-            color: #7f8c8d;
-            font-size: 0.95rem;
-        }
-
-        .event-icon {
-            margin-right: 8px;
-            color: #2575fc;
-        }
-
-        /* Registration Form */
-        .registration-form {
-            background: white;
-            border-radius: 10px;
-            padding: 30px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            max-width: 600px;
-            margin: 0 auto;
-            display: none;
-        }
-
-        .registration-form.active {
-            display: block;
-        }
-
-        .form-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-        }
-
-        .form-title {
-            font-size: 1.5rem;
-            color: #2c3e50;
-        }
-
-        .back-btn {
-            background: #e74c3c;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: background 0.3s;
-        }
-
-        .back-btn:hover {
-            background: #c0392b;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #2c3e50;
-        }
-
-        input, select {
-            width: 100%;
-            padding: 12px 15px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 1rem;
-            transition: border 0.3s;
-        }
-
-        input:focus, select:focus {
-            border-color: #2575fc;
-            outline: none;
-        }
-
-        .submit-btn {
-            background: #2575fc;
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 5px;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: background 0.3s;
-            width: 100%;
-            margin-top: 10px;
-        }
-
-        .submit-btn:hover {
-            background: #1a68e8;
-        }
-
-        /* Success Message */
-        .success-message {
-            background: white;
-            border-radius: 10px;
-            padding: 30px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            max-width: 500px;
-            margin: 0 auto;
-            display: none;
-        }
-
-        .success-message.active {
-            display: block;
-        }
-
-        .success-icon {
-            font-size: 4rem;
-            color: #2ecc71;
-            margin-bottom: 20px;
-        }
-
-        .success-title {
-            font-size: 1.8rem;
-            color: #2c3e50;
-            margin-bottom: 15px;
-        }
-
-        .success-text {
-            margin-bottom: 25px;
-            color: #7f8c8d;
-        }
-
-        .home-btn {
-            background: #2575fc;
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 5px;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        .home-btn:hover {
-            background: #1a68e8;
-        }
-
-        /* Admin Panel */
-        .admin-panel {
-            background: white;
-            border-radius: 10px;
-            padding: 30px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            margin-top: 30px;
-        }
-
-        .admin-title {
-            font-size: 1.8rem;
-            color: #2c3e50;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .admin-controls {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .admin-btn {
-            background: #2575fc;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: background 0.3s;
-        }
-
-        .admin-btn:hover {
-            background: #1a68e8;
-        }
-
-        .event-controls {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .event-csv-btn {
-            background: #27ae60;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: background 0.3s;
-        }
-
-        .event-csv-btn:hover {
-            background: #219a52;
-        }
-
-        .registrations-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        .registrations-table th, .registrations-table td {
-            padding: 12px 15px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .registrations-table th {
-            background-color: #f8f9fa;
-            font-weight: 600;
-            color: #2c3e50;
-        }
-
-        .registrations-table tr:hover {
-            background-color: #f8f9fa;
-        }
-
-        /* Admin Login */
-        .admin-login {
-            background: white;
-            border-radius: 10px;
-            padding: 30px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            max-width: 500px;
-            margin: 0 auto;
-            text-align: center;
-        }
-
-        .login-title {
-            font-size: 1.8rem;
-            color: #2c3e50;
-            margin-bottom: 20px;
-        }
-
-        .login-form {
-            margin-top: 20px;
-        }
-
-        .login-btn {
-            background: #2575fc;
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 5px;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: background 0.3s;
-            width: 100%;
-            margin-top: 20px;
-        }
-
-        .login-btn:hover {
-            background: #1a68e8;
-        }
-
-        .error-message {
-            color: #e74c3c;
-            margin-top: 10px;
-            font-weight: 500;
-        }
-
-        footer {
-            text-align: center;
-            margin-top: 50px;
-            padding: 20px;
-            color: #7f8c8d;
-            border-top: 1px solid #eee;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .events-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .tab {
-                padding: 10px 20px;
-                font-size: 1rem;
-            }
-            
-            .admin-controls {
-                flex-direction: column;
-            }
-            
-            .admin-btn {
-                width: 100%;
-            }
-            
-            .event-controls {
-                grid-template-columns: 1fr;
-            }
-        }
+        /* ... keep all your existing CSS ... */
     </style>
 </head>
 <body>
+    <!-- Your existing HTML structure remains the same -->
     <header>
         <div class="container">
             <div class="logo">
@@ -445,9 +30,9 @@
     </header>
 
     <div class="container">
+        <!-- Your existing tabs and content structure -->
         <div class="tabs">
             <div class="tab active" data-tab="events">Event Registration</div>
-            
             <div class="tab" data-tab="admin">Admin Panel</div>
         </div>
 
@@ -455,8 +40,6 @@
         <div class="tab-content active" id="events">
             <h2 style="text-align: center; margin-bottom: 20px;">Upcoming Events</h2>
             <p style="text-align: center; margin-bottom: 30px; color: #7f8c8d;">Click on any event to register</p>
-            <h3 style="text-align: center; margin-bottom: 20px;">Notice </h3>
-            <p style="text-align: center; margin-bottom: 30px; color: #7f8c8d;">ell rules hak</p>
             
             <div class="events-grid" id="events-container">
                 <!-- Events will be populated by JavaScript -->
@@ -494,8 +77,8 @@
                 
                 <div class="admin-controls">
                     <button class="admin-btn" id="view-registrations">View All Registrations</button>
+                    <button class="admin-btn" id="refresh-data">Refresh Data</button>
                     <button class="admin-btn" id="export-all-csv">Export All to CSV</button>
-                    <button class="admin-btn" id="clear-data">Clear All Data</button>
                 </div>
 
                 <h3 style="margin: 25px 0 15px 0; color: #2c3e50;">Export by Event</h3>
@@ -562,6 +145,10 @@
     </footer>
 
     <script>
+        // ========== CONFIGURATION ==========
+        // REPLACE THIS WITH YOUR GOOGLE APPS SCRIPT URL
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID_HERE/exec';
+        
         // Sample events data
         const events = [
             {
@@ -615,9 +202,8 @@
             }
         ];
 
-        // FIXED: SECURE ADMIN CREDENTIALS (Working Version)
+        // SECURE ADMIN CREDENTIALS
         const adminCredentials = (function() {
-            // Simple character code obfuscation - WORKS RELIABLY
             const user1Codes = [112, 114, 97, 106, 119, 97, 108]; // prajwal
             const user2Codes = [115, 117, 109, 117, 107, 104, 97]; // sumukha
             const passCodes = [98, 118, 99, 46, 46, 46, 46, 46, 64, 49, 54, 50, 48, 50, 53]; // bvc.....@162025
@@ -653,18 +239,67 @@
         const adminName = document.getElementById('admin-name');
         const logoutLink = document.getElementById('logout-link');
         const viewRegistrationsBtn = document.getElementById('view-registrations');
+        const refreshDataBtn = document.getElementById('refresh-data');
         const exportAllCsvBtn = document.getElementById('export-all-csv');
-        const clearDataBtn = document.getElementById('clear-data');
         const eventCsvButtons = document.getElementById('event-csv-buttons');
         const registrationsContainer = document.getElementById('registrations-container');
 
-        // Store registrations in localStorage
-        let registrations = JSON.parse(localStorage.getItem('eventRegistrations')) || [];
+        // Global variables
+        let registrations = [];
         let currentEvent = null;
         let currentAdmin = null;
 
+        // ========== GOOGLE SHEETS FUNCTIONS ==========
+        
+        // Save registration to Google Sheets
+        async function saveRegistrationToSheets(registration) {
+            try {
+                const response = await fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(registration)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    return true;
+                } else {
+                    throw new Error(result.error || 'Failed to save registration');
+                }
+            } catch (error) {
+                console.error('Error saving to Google Sheets:', error);
+                throw error;
+            }
+        }
+
+        // Load registrations from Google Sheets
+        async function loadRegistrationsFromSheets() {
+            try {
+                showLoading('Loading registrations...');
+                
+                const response = await fetch(GOOGLE_SCRIPT_URL);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch registrations');
+                }
+                
+                registrations = await response.json();
+                hideLoading();
+                return registrations;
+            } catch (error) {
+                console.error('Error loading from Google Sheets:', error);
+                hideLoading();
+                showError('Failed to load registrations: ' + error.message);
+                return [];
+            }
+        }
+
+        // ========== APPLICATION FUNCTIONS ==========
+
         // Initialize the application
-        function init() {
+        async function init() {
             displayEvents();
             setupEventListeners();
             checkAdminSession();
@@ -722,8 +357,10 @@
                             adminLogin.style.display = 'block';
                             adminPanel.style.display = 'none';
                         } else {
-                            // Update event CSV buttons when admin panel is opened
-                            updateEventCsvButtons();
+                            // Load fresh data when admin panel is opened
+                            loadRegistrationsFromSheets().then(() => {
+                                updateEventCsvButtons();
+                            });
                         }
                     }
                 });
@@ -742,34 +379,44 @@
                 studentRegistrationForm.reset();
             });
             
-            // Form submission
-            studentRegistrationForm.addEventListener('submit', (e) => {
+            // Form submission - UPDATED FOR GOOGLE SHEETS
+            studentRegistrationForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 
-                // Get form data
                 const formData = new FormData(studentRegistrationForm);
                 const registration = {
-                    id: Date.now(),
-                    eventId: currentEvent.id,
-                    eventName: currentEvent.title,
                     name: formData.get('student-name'),
                     usn: formData.get('student-usn'),
                     year: formData.get('student-year'),
                     phone: formData.get('student-phone'),
-                    registrationDate: new Date().toLocaleString()
+                    eventName: currentEvent.title
                 };
                 
-                // Save registration
-                registrations.push(registration);
-                localStorage.setItem('eventRegistrations', JSON.stringify(registrations));
-                
-                // Show success message
-                registrationForm.classList.remove('active');
-                successMessage.classList.add('active');
+                try {
+                    // Show loading state
+                    const submitBtn = studentRegistrationForm.querySelector('.submit-btn');
+                    submitBtn.textContent = 'Registering...';
+                    submitBtn.disabled = true;
+                    
+                    // Save to Google Sheets
+                    await saveRegistrationToSheets(registration);
+                    
+                    // Show success message
+                    registrationForm.classList.remove('active');
+                    successMessage.classList.add('active');
+                    
+                } catch (error) {
+                    alert('Registration failed. Please try again.\nError: ' + error.message);
+                } finally {
+                    // Reset button state
+                    const submitBtn = studentRegistrationForm.querySelector('.submit-btn');
+                    submitBtn.textContent = 'Register for Event';
+                    submitBtn.disabled = false;
+                }
             });
             
             // Admin login
-            loginForm.addEventListener('submit', (e) => {
+            loginForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 
                 const username = document.getElementById('admin-username').value;
@@ -782,8 +429,11 @@
                     adminPanel.style.display = 'block';
                     adminName.textContent = username;
                     loginError.textContent = '';
-                    displayRegistrations();
+                    
+                    // Load registrations when admin logs in
+                    await loadRegistrationsFromSheets();
                     updateEventCsvButtons();
+                    
                 } else {
                     loginError.textContent = 'Invalid username or password';
                 }
@@ -801,9 +451,13 @@
             });
             
             // Admin panel buttons
-            viewRegistrationsBtn.addEventListener('click', displayRegistrations);
+            viewRegistrationsBtn.addEventListener('click', () => displayRegistrations());
+            refreshDataBtn.addEventListener('click', async () => {
+                await loadRegistrationsFromSheets();
+                updateEventCsvButtons();
+                displayRegistrations();
+            });
             exportAllCsvBtn.addEventListener('click', exportAllToCSV);
-            clearDataBtn.addEventListener('click', clearAllData);
         }
 
         // Update event-specific CSV buttons
@@ -811,11 +465,11 @@
             eventCsvButtons.innerHTML = '';
             
             events.forEach(event => {
-                const eventRegistrations = registrations.filter(reg => reg.eventId === event.id);
+                const eventRegistrations = registrations.filter(reg => reg.eventName === event.title);
                 const button = document.createElement('button');
                 button.className = 'event-csv-btn';
                 button.innerHTML = `Export ${event.title} (${eventRegistrations.length})`;
-                button.addEventListener('click', () => exportEventToCSV(event.id));
+                button.addEventListener('click', () => exportEventToCSV(event.title));
                 eventCsvButtons.appendChild(button);
             });
         }
@@ -828,7 +482,6 @@
                 adminLogin.style.display = 'none';
                 adminPanel.style.display = 'block';
                 adminName.textContent = savedAdmin;
-                updateEventCsvButtons();
             }
         }
 
@@ -904,12 +557,11 @@
         }
 
         // Export specific event registrations to CSV
-        function exportEventToCSV(eventId) {
-            const event = events.find(e => e.id === eventId);
-            const eventRegistrations = registrations.filter(reg => reg.eventId === eventId);
+        function exportEventToCSV(eventName) {
+            const eventRegistrations = registrations.filter(reg => reg.eventName === eventName);
             
             if (eventRegistrations.length === 0) {
-                alert(`No registrations found for ${event.title}.`);
+                alert(`No registrations found for ${eventName}.`);
                 return;
             }
             
@@ -922,7 +574,7 @@
             });
             
             // Create filename from event title
-            const filename = `${event.title.toLowerCase().replace(/\s+/g, '_')}_registrations.csv`;
+            const filename = `${eventName.toLowerCase().replace(/\s+/g, '_')}_registrations.csv`;
             
             // Create and download the CSV file
             downloadCSV(csvContent, filename);
@@ -941,15 +593,27 @@
             document.body.removeChild(link);
         }
 
-        // Clear all registration data
-        function clearAllData() {
-            if (confirm('Are you sure you want to delete all registration data? This action cannot be undone.')) {
-                registrations = [];
-                localStorage.removeItem('eventRegistrations');
-                displayRegistrations();
-                updateEventCsvButtons();
-                alert('All registration data has been cleared.');
-            }
+        // Utility functions
+        function showLoading(message = 'Loading...') {
+            registrationsContainer.innerHTML = `
+                <div style="text-align: center; padding: 40px; color: #7f8c8d;">
+                    <div style="font-size: 3rem; margin-bottom: 20px;">⏳</div>
+                    <p>${message}</p>
+                </div>
+            `;
+        }
+
+        function hideLoading() {
+            // Loading state will be replaced when data loads
+        }
+
+        function showError(message) {
+            registrationsContainer.innerHTML = `
+                <div style="text-align: center; padding: 40px; color: #e74c3c;">
+                    <div style="font-size: 3rem; margin-bottom: 20px;">❌</div>
+                    <p>${message}</p>
+                </div>
+            `;
         }
 
         // Initialize the application when the page loads
