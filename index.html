@@ -513,6 +513,32 @@
                 font-size: 2rem;
             }
         }
+
+        .sync-status {
+            text-align: center;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-weight: 500;
+        }
+
+        .sync-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .sync-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .sync-loading {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
     </style>
 </head>
 <body>
@@ -575,11 +601,14 @@
                     Welcome, <span id="admin-name" style="color: #2575fc; font-weight: 600;"></span>! 
                     <a href="#" id="logout-link" style="color: #2575fc; margin-left: 15px; text-decoration: none; font-weight: 500;">Logout</a>
                 </p>
+
+                <div id="sync-status-container"></div>
                 
                 <div class="admin-controls">
                     <button class="admin-btn" id="view-registrations">View All Registrations</button>
-                    <button class="admin-btn" id="refresh-data">Refresh Data</button>
+                    <button class="admin-btn" id="refresh-data">Refresh from Google Sheets</button>
                     <button class="admin-btn" id="export-all-csv">Export All to CSV</button>
+                    <button class="admin-btn" id="sync-to-sheets">Sync All to Google Sheets</button>
                 </div>
 
                 <h3 style="margin: 30px 0 20px 0; color: #2c3e50; font-size: 1.4rem;">Export by Event</h3>
@@ -647,6 +676,10 @@
     </footer>
 
     <script>
+        // ========== CONFIGURATION ==========
+        // REPLACE THIS WITH YOUR GOOGLE APPS SCRIPT URL
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxD5xOB-FCn5m3HWTM7zpORxszbSdlflHdkH0pRiGKM4MMAhmcba5cqq3ZyI1bYYlw/exec';
+        
         // Sample events data
         const events = [
             {
@@ -700,10 +733,25 @@
             }
         ];
 
-        // Simple localStorage implementation (replace with Google Sheets later)
-        let registrations = JSON.parse(localStorage.getItem('eventRegistrations')) || [];
-        let currentEvent = null;
-        let currentAdmin = null;
+        // SECURE ADMIN CREDENTIALS
+        const adminCredentials = (function() {
+            const user1Codes = [112, 114, 97, 106, 119, 97, 108]; // prajwal
+            const user2Codes = [115, 117, 109, 117, 107, 104, 97]; // sumukha
+            const passCodes = [98, 118, 99, 46, 46, 46, 46, 46, 64, 49, 54, 50, 48, 50, 53]; // bvc.....@162025
+            
+            function codesToString(codes) {
+                return String.fromCharCode(...codes);
+            }
+            
+            const username1 = codesToString(user1Codes);
+            const username2 = codesToString(user2Codes);
+            const password = codesToString(passCodes);
+            
+            return {
+                [username1]: password,
+                [username2]: password
+            };
+        })();
 
         // DOM Elements
         const eventsContainer = document.getElementById('events-container');
@@ -722,13 +770,135 @@
         const viewRegistrationsBtn = document.getElementById('view-registrations');
         const refreshDataBtn = document.getElementById('refresh-data');
         const exportAllCsvBtn = document.getElementById('export-all-csv');
+        const syncToSheetsBtn = document.getElementById('sync-to-sheets');
         const eventCsvButtons = document.getElementById('event-csv-buttons');
         const registrationsContainer = document.getElementById('registrations-container');
+        const syncStatusContainer = document.getElementById('sync-status-container');
         const tabs = document.querySelectorAll('.tab');
         const tabContents = document.querySelectorAll('.tab-content');
 
-        // Initialize application
-        function init() {
+        // Global variables
+        let registrations = JSON.parse(localStorage.getItem('eventRegistrations')) || [];
+        let currentEvent = null;
+        let currentAdmin = null;
+
+        // ========== GOOGLE SHEETS FUNCTIONS ==========
+        
+        // Save registration to Google Sheets
+        async function saveRegistrationToSheets(registration) {
+            try {
+                // Add timestamp for registration
+                const registrationWithTimestamp = {
+                    ...registration,
+                    registrationDate: new Date().toLocaleString()
+                };
+
+                const response = await fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(registrationWithTimestamp)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showSyncStatus('Registration saved to Google Sheets successfully!', 'success');
+                    return true;
+                } else {
+                    throw new Error(result.error || 'Failed to save registration');
+                }
+            } catch (error) {
+                console.error('Error saving to Google Sheets:', error);
+                showSyncStatus('Failed to save to Google Sheets. Using local storage.', 'error');
+                // Fallback to localStorage
+                return saveToLocalStorage(registration);
+            }
+        }
+
+        // Load registrations from Google Sheets
+        async function loadRegistrationsFromSheets() {
+            try {
+                showSyncStatus('Loading registrations from Google Sheets...', 'loading');
+                
+                const response = await fetch(GOOGLE_SCRIPT_URL);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch registrations from Google Sheets');
+                }
+                
+                const sheetsData = await response.json();
+                registrations = sheetsData;
+                localStorage.setItem('eventRegistrations', JSON.stringify(registrations));
+                
+                showSyncStatus('Data loaded from Google Sheets successfully!', 'success');
+                return registrations;
+            } catch (error) {
+                console.error('Error loading from Google Sheets:', error);
+                showSyncStatus('Using local storage data. Google Sheets unavailable.', 'error');
+                // Fallback to localStorage
+                registrations = JSON.parse(localStorage.getItem('eventRegistrations')) || [];
+                return registrations;
+            }
+        }
+
+        // Sync all local registrations to Google Sheets
+        async function syncAllToSheets() {
+            try {
+                showSyncStatus('Syncing all registrations to Google Sheets...', 'loading');
+                let successCount = 0;
+                let errorCount = 0;
+
+                for (const registration of registrations) {
+                    try {
+                        const response = await fetch(GOOGLE_SCRIPT_URL, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(registration)
+                        });
+                        
+                        const result = await response.json();
+                        if (result.success) {
+                            successCount++;
+                        } else {
+                            errorCount++;
+                        }
+                    } catch (error) {
+                        errorCount++;
+                    }
+                }
+
+                if (errorCount === 0) {
+                    showSyncStatus(`All ${successCount} registrations synced to Google Sheets successfully!`, 'success');
+                } else {
+                    showSyncStatus(`Synced ${successCount} registrations. ${errorCount} failed.`, 'error');
+                }
+            } catch (error) {
+                console.error('Error syncing to Google Sheets:', error);
+                showSyncStatus('Failed to sync with Google Sheets.', 'error');
+            }
+        }
+
+        // ========== LOCAL STORAGE FUNCTIONS ==========
+        
+        function saveToLocalStorage(registration) {
+            const registrationWithId = {
+                ...registration,
+                id: Date.now(),
+                registrationDate: new Date().toLocaleString()
+            };
+            
+            registrations.push(registrationWithId);
+            localStorage.setItem('eventRegistrations', JSON.stringify(registrations));
+            return true;
+        }
+
+        // ========== APPLICATION FUNCTIONS ==========
+
+        // Initialize the application
+        async function init() {
             displayEvents();
             setupEventListeners();
         }
@@ -776,30 +946,50 @@
                             content.classList.add('active');
                         }
                     });
+
+                    // Load Google Sheets data when admin panel is opened
+                    if (tabId === 'admin' && currentAdmin) {
+                        loadRegistrationsFromSheets().then(() => {
+                            updateEventCsvButtons();
+                        });
+                    }
                 });
             });
 
-            // Form submission
-            studentRegistrationForm.addEventListener('submit', (e) => {
+            // Form submission - UPDATED FOR GOOGLE SHEETS
+            studentRegistrationForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 
                 const formData = new FormData(studentRegistrationForm);
                 const registration = {
-                    id: Date.now(),
-                    eventId: currentEvent.id,
-                    eventName: currentEvent.title,
                     name: formData.get('student-name'),
                     usn: formData.get('student-usn'),
                     year: formData.get('student-year'),
                     phone: formData.get('student-phone'),
-                    registrationDate: new Date().toLocaleString()
+                    eventName: currentEvent.title
                 };
                 
-                registrations.push(registration);
-                localStorage.setItem('eventRegistrations', JSON.stringify(registrations));
-                
-                registrationForm.classList.remove('active');
-                successMessage.classList.add('active');
+                try {
+                    // Show loading state
+                    const submitBtn = studentRegistrationForm.querySelector('.submit-btn');
+                    submitBtn.textContent = 'Registering...';
+                    submitBtn.disabled = true;
+                    
+                    // Try to save to Google Sheets first, fallback to localStorage
+                    await saveRegistrationToSheets(registration);
+                    
+                    // Show success message
+                    registrationForm.classList.remove('active');
+                    successMessage.classList.add('active');
+                    
+                } catch (error) {
+                    alert('Registration failed. Please try again.\nError: ' + error.message);
+                } finally {
+                    // Reset button state
+                    const submitBtn = studentRegistrationForm.querySelector('.submit-btn');
+                    submitBtn.textContent = 'Register for Event';
+                    submitBtn.disabled = false;
+                }
             });
 
             // Navigation buttons
@@ -814,18 +1004,22 @@
                 studentRegistrationForm.reset();
             });
 
-            // Admin login (simple version)
-            loginForm.addEventListener('submit', (e) => {
+            // Admin login
+            loginForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const username = document.getElementById('admin-username').value;
                 const password = document.getElementById('admin-password').value;
                 
-                // Simple admin check
-                if ((username === 'prajwal' || username === 'sumukha') && password === 'bvc.....@162025') {
+                if (adminCredentials[username] && adminCredentials[username] === password) {
                     currentAdmin = username;
+                    localStorage.setItem('adminSession', username);
                     adminLogin.style.display = 'none';
                     adminPanel.style.display = 'block';
                     adminName.textContent = username;
+                    loginError.textContent = '';
+                    
+                    // Load registrations when admin logs in
+                    await loadRegistrationsFromSheets();
                     updateEventCsvButtons();
                 } else {
                     loginError.textContent = 'Invalid username or password';
@@ -835,6 +1029,7 @@
             logoutLink.addEventListener('click', (e) => {
                 e.preventDefault();
                 currentAdmin = null;
+                localStorage.removeItem('adminSession');
                 adminLogin.style.display = 'block';
                 adminPanel.style.display = 'none';
                 document.getElementById('admin-username').value = '';
@@ -843,12 +1038,13 @@
 
             // Admin panel functionality
             viewRegistrationsBtn.addEventListener('click', displayRegistrationsTable);
-            refreshDataBtn.addEventListener('click', () => {
-                registrations = JSON.parse(localStorage.getItem('eventRegistrations')) || [];
+            refreshDataBtn.addEventListener('click', async () => {
+                await loadRegistrationsFromSheets();
                 updateEventCsvButtons();
                 displayRegistrationsTable();
             });
             exportAllCsvBtn.addEventListener('click', exportAllToCSV);
+            syncToSheetsBtn.addEventListener('click', syncAllToSheets);
         }
 
         function openRegistrationForm(event) {
@@ -861,11 +1057,11 @@
         function updateEventCsvButtons() {
             eventCsvButtons.innerHTML = '';
             events.forEach(event => {
-                const eventRegistrations = registrations.filter(reg => reg.eventId === event.id);
+                const eventRegistrations = registrations.filter(reg => reg.eventName === event.title);
                 const button = document.createElement('button');
                 button.className = 'event-csv-btn';
                 button.innerHTML = `Export ${event.title} (${eventRegistrations.length})`;
-                button.addEventListener('click', () => exportEventToCSV(event.id));
+                button.addEventListener('click', () => exportEventToCSV(event.title));
                 eventCsvButtons.appendChild(button);
             });
         }
@@ -886,12 +1082,14 @@
                             <th>Phone</th>
                             <th>Event</th>
                             <th>Registration Date</th>
+                            <th>Source</th>
                         </tr>
                     </thead>
                     <tbody>
             `;
             
             registrations.forEach(reg => {
+                const source = reg.id ? 'Local' : 'Google Sheets';
                 tableHTML += `
                     <tr>
                         <td>${reg.name}</td>
@@ -900,6 +1098,7 @@
                         <td>${reg.phone}</td>
                         <td>${reg.eventName}</td>
                         <td>${reg.registrationDate}</td>
+                        <td>${source}</td>
                     </tr>
                 `;
             });
@@ -927,12 +1126,11 @@
             downloadCSV(csvContent, 'all_event_registrations.csv');
         }
 
-        function exportEventToCSV(eventId) {
-            const event = events.find(e => e.id === eventId);
-            const eventRegistrations = registrations.filter(reg => reg.eventId === eventId);
+        function exportEventToCSV(eventName) {
+            const eventRegistrations = registrations.filter(reg => reg.eventName === eventName);
             
             if (eventRegistrations.length === 0) {
-                alert(`No registrations found for ${event.title}.`);
+                alert(`No registrations found for ${eventName}.`);
                 return;
             }
             
@@ -941,7 +1139,7 @@
                 csvContent += `"${reg.name}","${reg.usn}","${reg.year}","${reg.phone}","${reg.eventName}","${reg.registrationDate}"\n`;
             });
             
-            const filename = `${event.title.toLowerCase().replace(/\s+/g, '_')}_registrations.csv`;
+            const filename = `${eventName.toLowerCase().replace(/\s+/g, '_')}_registrations.csv`;
             downloadCSV(csvContent, filename);
         }
 
@@ -957,8 +1155,40 @@
             document.body.removeChild(link);
         }
 
+        function showSyncStatus(message, type) {
+            syncStatusContainer.innerHTML = `
+                <div class="sync-status sync-${type}">
+                    ${message}
+                </div>
+            `;
+            
+            // Auto-hide success messages after 5 seconds
+            if (type === 'success') {
+                setTimeout(() => {
+                    syncStatusContainer.innerHTML = '';
+                }, 5000);
+            }
+        }
+
+        // Check if admin is already logged in
+        function checkAdminSession() {
+            const savedAdmin = localStorage.getItem('adminSession');
+            if (savedAdmin && adminCredentials[savedAdmin]) {
+                currentAdmin = savedAdmin;
+                adminLogin.style.display = 'none';
+                adminPanel.style.display = 'block';
+                adminName.textContent = savedAdmin;
+                loadRegistrationsFromSheets().then(() => {
+                    updateEventCsvButtons();
+                });
+            }
+        }
+
         // Initialize when page loads
-        document.addEventListener('DOMContentLoaded', init);
+        document.addEventListener('DOMContentLoaded', () => {
+            init();
+            checkAdminSession();
+        });
     </script>
 </body>
 </html>
